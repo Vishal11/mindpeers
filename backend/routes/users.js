@@ -3,7 +3,7 @@ var router = express.Router();
 var userService = require("./../services/userService");
 
 /* GET users listing. */
-router.post("/signup", function (req, res, next) {
+router.post('/signup', function (req, res, next) {
   userService
     .signupUser(req.body)
     .then((result) => {
