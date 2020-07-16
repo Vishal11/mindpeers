@@ -42,50 +42,48 @@ signupUser = function (user) {
 authenticateUser = function (user) {
   return new Promise((resolve, reject) => {
     if (user.userType == "doctor") {
-      bcrypt.hash(user.password, saltRounds, function (err, hash) {
+      DoctorSchema.findOne({ email: user.email }, function (err, data) {
         if (err) {
           reject(err);
         }
-        let pwd = hash;
-        DoctorSchema.findOne({ email: user.email }, function (err, data) {
-          if (err) {
-            reject(err);
-          }
-          console.log(data);
-          if (!!data) {
-            if (data.password == hash) {
+        console.log(data);
+        if (!!data) {
+          bcrypt.compare(user.password, data.password, function (err, res) {
+            if (err) {
+              reject(err);
+            }
+            if (res) {
               resolve("Successfull Login !!");
             } else {
               reject("Wrong Password !!");
             }
-          } else {
-            reject("User not exist !!");
-          }
-        });
+          });
+        } else {
+          reject("User not exist !!");
+        }
       });
     } else {
       const userModel = new UserSchema(user);
-      
-        UserSchema.findOne({ email: user.email }, function (err, data) {
-          if (err) {
-            reject(err);
-          }
-          if (!!data) {
-            bcrypt.compare(user.password, data.password, function(err, res) {
-                if (err){
-                  reject(err);
-                }
-                if (res){
-                resolve("Successfull Login !!");
-                } else {
-                    reject("Wrong Password !!");
 
-                }
-              });
-          } else {
-            reject("User not exist !!");
-          }
-        });
+      UserSchema.findOne({ email: user.email }, function (err, data) {
+        if (err) {
+          reject(err);
+        }
+        if (!!data) {
+          bcrypt.compare(user.password, data.password, function (err, res) {
+            if (err) {
+              reject(err);
+            }
+            if (res) {
+              resolve("Successfull Login !!");
+            } else {
+              reject("Wrong Password !!");
+            }
+          });
+        } else {
+          reject("User not exist !!");
+        }
+      });
     }
   });
 };
@@ -103,6 +101,20 @@ getAvailableDoctor = function (user) {
     });
   });
 };
+
+// bookAppointment = function (user) {
+//   return new Promise((resolve, reject) => {
+//     DoctorSchema.find({}, "name email phone specialization", function (
+//       err,
+//       data
+//     ) {
+//       if (err) {
+//         reject(err);
+//       }
+//       resolve(data);
+//     });
+//   });
+// };
 
 module.exports = {
   signupUser,
