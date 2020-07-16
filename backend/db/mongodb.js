@@ -1,6 +1,6 @@
 var mongoose =  require('mongoose');
 
-mongoose.connect('mongodb://localhost:27017/Test',{ useNewUrlParser: true, useUnifiedTopology: true});
+mongoose.connect('mongodb://localhost:27017/Mindpeers',{ useNewUrlParser: true, useUnifiedTopology: true});
 
 
 mongoose.connection.on('connected', ()=> {
