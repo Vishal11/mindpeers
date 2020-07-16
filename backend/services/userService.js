@@ -69,12 +69,21 @@ authenticateUser = function (user) {
         if (err) {
           reject(err);
         }
-        userModel.password = hash;
-        userModel.save(function (err, data) {
+        let pwd = hash;
+        UserSchema.findOne({ email: user.email }, function (err, data) {
           if (err) {
             reject(err);
           }
-          resolve("success");
+          console.log(data);
+          if (!!data) {
+            if (data.password == hash) {
+              resolve("Successfull Login !!");
+            } else {
+              reject("Wrong Password !!");
+            }
+          } else {
+            reject("User not exist !!");
+          }
         });
       });
     }
@@ -98,5 +107,5 @@ getAvailableDoctor = function (user) {
 module.exports = {
   signupUser,
   authenticateUser,
-  getAvailableDoctor
+  getAvailableDoctor,
 };
