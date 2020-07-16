@@ -24,5 +24,16 @@ router.post('/login', function (req, res, next) {
     });
 });
 
+router.get('/doctorlist', function (req, res, next) {
+  userService
+    .getAvailableDoctor(req.session)
+    .then((result) => {
+      return res.json({success: true, message: result, data:null});
+    })
+    .catch((err) => {
+      return res.status(400).json({success:false, message: err, data:null });
+    });
+});
+
 
 module.exports = router;
