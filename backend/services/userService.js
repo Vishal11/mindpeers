@@ -65,27 +65,27 @@ authenticateUser = function (user) {
       });
     } else {
       const userModel = new UserSchema(user);
-      bcrypt.hash(user.password, saltRounds, function (err, hash) {
-        if (err) {
-          reject(err);
-        }
-        let pwd = hash;
+      
         UserSchema.findOne({ email: user.email }, function (err, data) {
           if (err) {
             reject(err);
           }
-          console.log(data);
           if (!!data) {
-            if (data.password == hash) {
-              resolve("Successfull Login !!");
-            } else {
-              reject("Wrong Password !!");
-            }
+            bcrypt.compare(user.password, data.password, function(err, res) {
+                if (err){
+                  reject(err);
+                }
+                if (res){
+                resolve("Successfull Login !!");
+                } else {
+                    reject("Wrong Password !!");
+
+                }
+              });
           } else {
             reject("User not exist !!");
           }
         });
-      });
     }
   });
 };
