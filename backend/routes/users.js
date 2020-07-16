@@ -17,7 +17,7 @@ router.post('/login', function (req, res, next) {
   userService
     .authenticateUser(req.body)
     .then((result) => {
-      return res.json({success: true, message: result, data:null});
+      return res.json({success: true, message: "Login Successfull !!", data:result});
     })
     .catch((err) => {
       return res.status(400).json({success:false, message: err, data:null });

@@ -53,7 +53,8 @@ authenticateUser = function (user) {
               reject(err);
             }
             if (res) {
-              resolve("Successfull Login !!");
+              delete data.password;
+              resolve(data);
             } else {
               reject("Wrong Password !!");
             }
@@ -75,7 +76,8 @@ authenticateUser = function (user) {
               reject(err);
             }
             if (res) {
-              resolve("Successfull Login !!");
+              delete data.password;
+              resolve(data);
             } else {
               reject("Wrong Password !!");
             }
