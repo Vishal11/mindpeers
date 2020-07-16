@@ -2,7 +2,7 @@ var mongoose =  require('mongoose');
 
 const Schema = mongoose.Schema;
 
-const UserSchema = new Schema({
+const DoctorSchema = new Schema({
     name: {
 		type 	: String, 
 		required: true
@@ -17,13 +17,13 @@ const UserSchema = new Schema({
 		bcrypt  : true
     },
     gender: {
-        type: String,
-        required: true
+        type: String
     },
+    phone: Number,
     city: String,
-    medIssue: String
+    specialization: String
 
-},{collection : "user"})
+},{collection : "doctor"})
 
 
-exports.UserSchema = mongoose.model('user', UserSchema)
+exports.DoctorSchema = mongoose.model('doctor', DoctorSchema)

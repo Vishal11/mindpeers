@@ -12,9 +12,3 @@ mongoose.connection.on('error', (err)=> {
 mongoose.connection.on('disconnected', ()=> {
     console.log('Connection closed');
 })
-
-process.on('SIGINT', () => {
-    mongoose.connection.close(()=> {
-        console.log('Connection closed: Service terminated');
-    })
-})
