@@ -2,16 +2,38 @@ var express = require("express");
 var router = express.Router();
 var userService = require("./../services/userService");
 
-/* GET users listing. */
 router.post('/signup', function (req, res, next) {
   userService
     .signupUser(req.body)
     .then((result) => {
-      res.json({success: true, message: "Account Created !!", data:null});
+      return res.json({success: true, message: "Account Created !!", data:null});
     })
     .catch((err) => {
-      return res.status(400).json({ message: err.message });
+      return res.status(400).json({success:false, message: err.message,data:null });
     });
 });
+
+router.post('/login', function (req, res, next) {
+  userService
+    .authenticateUser(req.body)
+    .then((result) => {
+      return res.json({success: true, message: result, data:null});
+    })
+    .catch((err) => {
+      return res.status(400).json({success:false, message: err, data:null });
+    });
+});
+
+router.get('/doctorlist', function (req, res, next) {
+  userService
+    .getAvailableDoctor(req.session)
+    .then((result) => {
+      return res.json({success: true, message: result, data:null});
+    })
+    .catch((err) => {
+      return res.status(400).json({success:false, message: err, data:null });
+    });
+});
+
 
 module.exports = router;
