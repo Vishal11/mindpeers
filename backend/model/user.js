@@ -17,9 +17,7 @@ const UserSchema = new Schema({
 		bcrypt  : true
     },
     gender: {
-        type: String,
-        required: true,
-        enum: ['M','F']
+        type: String
     },
     city: String,
     medIssue: String,
