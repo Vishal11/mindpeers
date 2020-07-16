@@ -1,4 +1,7 @@
 var {UserSchema}= require('./../model/user');
+var bcrypt = require('bcrypt');
+const saltRounds = 10;
+
 
 signupUser = function(user) {
 
@@ -6,11 +9,17 @@ signupUser = function(user) {
 
         const userModel = new UserSchema(user);
 
-       userModel.save(function(err, data) {
+        bcrypt.hash(user.password, saltRounds, function(err, hash) {
             if(err) {
                 reject(err);
             }
-            resolve('success');
+            userModel.password = hash;
+            userModel.save(function(err, data) {
+                if(err) {
+                    reject(err);
+                }
+                resolve('success');
+            });
         });
 
     })
