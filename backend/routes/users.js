@@ -46,5 +46,16 @@ router.post('/appointments', function (req, res, next) {
     });
 });
 
+router.post('/appointmentslist', function (req, res, next) {
+  userService
+    .getAppointmentDetails(req.body)
+    .then((data) => {
+      return res.json({success: true, message: "Appointment List", data:data});
+    })
+    .catch((err) => {
+      return res.status(400).json({success:false, message: err, data:null });
+    });
+});
+
 
 module.exports = router;

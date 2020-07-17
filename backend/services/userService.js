@@ -95,15 +95,28 @@ getAvailableDoctor = function (filter) {
   return new Promise((resolve, reject) => {
     let date = new Date(filter.date);
     let medIssue = filter.medIssue;
-    DoctorSchema.find({}, "name email phone specialization", function (
-      err,
-      data
-    ) {
-      if (err) {
-        reject(err);
+    DoctorSchema.aggregate(
+      [
+        {
+          $match: { $text: { $search: medIssue } },
+        },
+        {
+          $project: {
+            name: 1,
+            email: 1,
+            specialization: 1,
+            phone: 1,
+            city: 1,
+          },
+        },
+      ],
+      function (err, data) {
+        if (err) {
+          reject(err);
+        }
+        resolve(data);
       }
-      resolve(data);
-    });
+    );
   });
 };
 
@@ -112,7 +125,11 @@ bookAppointment = function (bookDetail) {
     let userDetail = bookDetail.user;
     let doctorDetail = bookDetail.doctor;
     AppointmentSchema.findOneAndUpdate(
-      { email: doctorDetail.email, name: doctorDetail.name, appointmentDate: bookDetail.date },
+      {
+        email: doctorDetail.email,
+        name: doctorDetail.name,
+        appointmentDate: bookDetail.date,
+      },
       { $addToSet: { pendingList: userDetail } },
       { new: true, upsert: true },
       function (err, data) {
@@ -125,9 +142,31 @@ bookAppointment = function (bookDetail) {
   });
 };
 
+getAppointmentDetails = function (doctor) {
+  return new Promise((resolve, reject) => {
+    let filter = {};
+    filter["name"] = doctor.name;
+    filter["email"] = doctor.email;
+    filter["appointmentDate"] = {
+      $gte: new Date(
+        new Date().getFullYear(),
+        new Date().getMonth(),
+        new Date().getDate()
+      ),
+    };
+    AppointmentSchema.find(filter, function (err, data) {
+      if (err) {
+        reject(err);
+      }
+      resolve(data);
+    });
+  });
+};
+
 module.exports = {
   signupUser,
   authenticateUser,
   getAvailableDoctor,
-  bookAppointment
+  bookAppointment,
+  getAppointmentDetails
 };

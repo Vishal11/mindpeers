@@ -25,5 +25,8 @@ const DoctorSchema = new Schema({
 
 },{collection : "doctor"})
 
+DoctorSchema.index({specialization:'text'});
+
+
 
 exports.DoctorSchema = mongoose.model('doctor', DoctorSchema)
