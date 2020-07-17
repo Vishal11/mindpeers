@@ -125,39 +125,25 @@ getAvailableDoctor = function (filter) {
               },
               {
                 $addFields: {
-                  availability: {
+                  appointmentCount: {
                     $cond: {
                       if: {
-                        $or: [
-                          {
-                            $approvedList: { $exist: false },
-                          },
-                          {
-                            $and: [
-                              {
-                                $approvedList: { $exist: true },
-                              },
-                              {
-                                $lte: [{ $size: "$approvedList" }, 3],
-                              },
-                            ],
-                          },
-                        ],
+                        $isArray : "$approvedList"
                       },
-                      then : true,
-                      else : false
+                      then : {$size: "$approvedList"},
+                      else : 0
                     },
                   },
                 },
               },
-              { $project: { _id: 0, availability:1 } },
+              { $project: { _id: 0, appointmentCount:1 } },
             ],
             as: "appointmentAvailibilty",
           },
         },
         {
-          $unwind: appointmentAvailibilty
-        },
+          $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$appointmentAvailibilty", 0 ] }, "$$ROOT" ] } }
+       },
         {
           $project: {
             name: 1,
@@ -165,7 +151,8 @@ getAvailableDoctor = function (filter) {
             specialization: 1,
             phone: 1,
             city: 1,
-            availability:1
+            appointmentCount:1,
+            appointmentAvailibilty: 0
           },
         },
       ],
