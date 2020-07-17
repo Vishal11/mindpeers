@@ -25,7 +25,7 @@ router.post('/login', function (req, res, next) {
     });
 });
 
-router.post('/doctorlist', function (req, res, next) {
+router.post('/doctorlist', verifyTokenFunc ,function (req, res, next) {
   userService
     .getAvailableDoctor(req.body)
     .then((data) => {
@@ -36,7 +36,7 @@ router.post('/doctorlist', function (req, res, next) {
     });
 });
 
-router.post('/appointments', function (req, res, next) {
+router.post('/appointments', verifyTokenFunc, function (req, res, next) {
   userService
     .bookAppointment(req.body)
     .then((data) => {
@@ -47,7 +47,7 @@ router.post('/appointments', function (req, res, next) {
     });
 });
 
-router.post('/appointmentslist', function (req, res, next) {
+router.post('/appointmentslist', verifyTokenFunc, function (req, res, next) {
   userService
     .getAppointmentDetails(req.body)
     .then((data) => {
@@ -58,7 +58,7 @@ router.post('/appointmentslist', function (req, res, next) {
     });
 });
 
-router.put('/appointments/:id', function (req, res, next) {
+router.put('/appointments/:id', verifyTokenFunc, function (req, res, next) {
   userService
     .approveAppointment(req.params.id, req.body)
     .then((data) => {
@@ -69,5 +69,15 @@ router.put('/appointments/:id', function (req, res, next) {
     });
 });
 
+function verifyTokenFunc(req, res, next) {
+  const header = req.headers['authorization'];
+  const accessToken = header && header.split(' ')[1];
+  if(accessToken == null) return res.sendStatus(401);
+
+  jwt.verify(accessToken, process.env.ACCESS_TOKEN_KEY, (err, user) => {
+    if(err) return res.sendStatus(403);
+    next();
+  })
+}
 
 module.exports = router;
