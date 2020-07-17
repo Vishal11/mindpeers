@@ -24,11 +24,22 @@ router.post('/login', function (req, res, next) {
     });
 });
 
-router.get('/doctorlist', function (req, res, next) {
+router.post('/doctorlist', function (req, res, next) {
   userService
-    .getAvailableDoctor(req.session)
+    .getAvailableDoctor(req.body)
     .then((data) => {
       return res.json({success: true, message: "Doctor List", data:data});
+    })
+    .catch((err) => {
+      return res.status(400).json({success:false, message: err, data:null });
+    });
+});
+
+router.get('/book', function (req, res, next) {
+  userService
+    .bookAppointment(req.body)
+    .then((data) => {
+      return res.json({success: true, message: "Appointment Booked", data:data});
     })
     .catch((err) => {
       return res.status(400).json({success:false, message: err, data:null });

@@ -1,5 +1,6 @@
 var { UserSchema } = require("./../model/user");
 var { DoctorSchema } = require("./../model/doctor");
+var { AppointmentSchema } = require("./../model/appointment");
 
 var bcrypt = require("bcrypt");
 const saltRounds = 10;
@@ -90,8 +91,10 @@ authenticateUser = function (user) {
   });
 };
 
-getAvailableDoctor = function (user) {
+getAvailableDoctor = function (filter) {
   return new Promise((resolve, reject) => {
+    let date = new Date(filter.date);
+    let medIssue = filter.medIssue;
     DoctorSchema.find({}, "name email phone specialization", function (
       err,
       data
@@ -104,22 +107,27 @@ getAvailableDoctor = function (user) {
   });
 };
 
-// bookAppointment = function (user) {
-//   return new Promise((resolve, reject) => {
-//     DoctorSchema.find({}, "name email phone specialization", function (
-//       err,
-//       data
-//     ) {
-//       if (err) {
-//         reject(err);
-//       }
-//       resolve(data);
-//     });
-//   });
-// };
+bookAppointment = function (bookDetail) {
+  return new Promise((resolve, reject) => {
+    let userDetail = bookDetail.user;
+    let doctorDetail = bookDetail.doctor;
+    AppointmentSchema.findOneAndUpdate(
+      { email: doctorDetail.email, name: doctorDetail.name, appointmentDate: bookDetail.appointmentDate },
+      { $addToSet: { pendingList: userDetail } },
+      { new: true, upsert: true },
+      function (err, data) {
+        if (err) {
+          reject(err);
+        }
+        resolve(data);
+      }
+    );
+  });
+};
 
 module.exports = {
   signupUser,
   authenticateUser,
   getAvailableDoctor,
+  bookAppointment
 };

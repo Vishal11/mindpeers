@@ -3,7 +3,7 @@ var mongoose =  require('mongoose');
 const Schema = mongoose.Schema;
 const UserDetail = new Schema({name: String, email: String, phone: Number, city: String, medIssue: String})
 
-const DoctorSchema = new Schema({
+const AppointmentSchema = new Schema({
     name: {
 		type 	: String, 
 		required: true
@@ -12,15 +12,15 @@ const DoctorSchema = new Schema({
 		type 	: String, 
 		required: true
     },
-    appointmentDate: Date,
-    limit: {
+    limit:{
       type: Number,
-      default:3
+      default: 3
     },
-    aprovedList: [UserDetail],
+    appointmentDate: Date,
+    approvedList: [UserDetail],
     pendingList: [UserDetail]
 
-},{collection : "doctor"})
+},{collection : "appointment"})
 
 
-exports.DoctorSchema = mongoose.model('doctor', DoctorSchema)
+exports.AppointmentSchema = mongoose.model('appointment', AppointmentSchema)
