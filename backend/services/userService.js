@@ -95,10 +95,68 @@ getAvailableDoctor = function (filter) {
   return new Promise((resolve, reject) => {
     let date = new Date(filter.date);
     let medIssue = filter.medIssue;
+    let dateFilter = {};
+    dateFilter["appointmentDate"] = {
+      $gte: new Date(
+        new Date().getFullYear(),
+        new Date().getMonth(),
+        new Date().getDate()
+      ),
+    };
     DoctorSchema.aggregate(
       [
         {
           $match: { $text: { $search: medIssue } },
+        },
+        {
+          $lookup: {
+            from: "appointment",
+            let: { doctor_email: "$email" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [
+                      { $eq: ["$email", "$$doctor_email"] },
+                        dateFilter,
+                    ],
+                  },
+                },
+              },
+              {
+                $addFields: {
+                  availability: {
+                    $cond: {
+                      if: {
+                        $or: [
+                          {
+                            $approvedList: { $exist: false },
+                          },
+                          {
+                            $and: [
+                              {
+                                $approvedList: { $exist: true },
+                              },
+                              {
+                                $lte: [{ $size: "$approvedList" }, 3],
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                      then : true,
+                      else : false
+                    },
+                  },
+                },
+              },
+              { $project: { _id: 0, availability:1 } },
+            ],
+            as: "appointmentAvailibilty",
+          },
+        },
+        {
+          $unwind: appointmentAvailibilty
         },
         {
           $project: {
@@ -107,6 +165,7 @@ getAvailableDoctor = function (filter) {
             specialization: 1,
             phone: 1,
             city: 1,
+            availability:1
           },
         },
       ],
@@ -123,9 +182,9 @@ getAvailableDoctor = function (filter) {
 bookAppointment = function (bookDetail) {
   return new Promise((resolve, reject) => {
     let userDetail = bookDetail.user;
-    userDetail['date'] = bookDetail.date;
+    userDetail["date"] = bookDetail.date;
     let doctorDetail = bookDetail.doctor;
-    doctorDetail['date'] = bookDetail.date;
+    doctorDetail["date"] = bookDetail.date;
     AppointmentSchema.findOneAndUpdate(
       {
         email: doctorDetail.email,
@@ -167,13 +226,19 @@ getAppointmentDetails = function (doctor) {
 
 approveAppointment = function (id, user) {
   return new Promise((resolve, reject) => {
-  
-    AppointmentSchema.update({"_id": id}, {$pull:{pendingList: {"name": user.name, "email": user.email}}, $push:{approvedList:user}}, function (err, data) {
-      if (err) {
-        reject(err);
+    AppointmentSchema.update(
+      { _id: id },
+      {
+        $pull: { pendingList: { name: user.name, email: user.email } },
+        $push: { approvedList: user },
+      },
+      function (err, data) {
+        if (err) {
+          reject(err);
+        }
+        resolve(data);
       }
-      resolve(data);
-    });
+    );
   });
 };
 
@@ -183,5 +248,5 @@ module.exports = {
   getAvailableDoctor,
   bookAppointment,
   getAppointmentDetails,
-  approveAppointment
+  approveAppointment,
 };
