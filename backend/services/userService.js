@@ -94,15 +94,12 @@ authenticateUser = function (user) {
 getAvailableDoctor = function (filter) {
   return new Promise((resolve, reject) => {
     let date = new Date(filter.date);
+    let nextDate = new Date(filter.date);
+nextDate.setDate(date.getDate()+1);
+
+
     let medIssue = filter.medIssue;
-    let dateFilter = {};
-    dateFilter["appointmentDate"] = {
-      $gte: new Date(
-        new Date().getFullYear(),
-        new Date().getMonth(),
-        new Date().getDate()
-      ),
-    };
+    
     DoctorSchema.aggregate(
       [
         {
@@ -118,7 +115,13 @@ getAvailableDoctor = function (filter) {
                   $expr: {
                     $and: [
                       { $eq: ["$email", "$$doctor_email"] },
-                        dateFilter,
+                    //   {
+                    //       $and : [ {
+                    //           "appointmentDate" : {$gte: date}
+                    //       }, {
+                    //         "appointmentDate" : {$lt: nextDate}
+                    //       }]
+                    //   }
                     ],
                   },
                 },
