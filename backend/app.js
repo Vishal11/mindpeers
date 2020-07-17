@@ -7,12 +7,24 @@ var cors = require('cors')
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var mongodb = require('./db/mongodb');
+var multer = require('multer');
 require('dotenv').config();
 var app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
+
+var storage = multer.diskStorage({
+  destination: DIR,
+  filename: function (req, file, cb) { 
+      cb(null,ProjectId +"_"+ file.originalname)      
+
+          }
+})
+
+var upload = multer({ storage: storage }).any();
+
 app.use(cors())
 app.use(logger('dev'));
 app.use(express.json());
@@ -21,8 +33,15 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-app.use('/api/user', usersRouter);
+// upload(req, res, function (err) {       
+//   if (err) {
+//     return res.end(err.toString());
+//   }   
+//   res.end('File is uploaded');
+//   });
 
+app.use('/api/user', usersRouter);
+app.use('/uploads',express.static(path.join(__dirname,"/uploads")));
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
