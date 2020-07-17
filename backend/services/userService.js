@@ -146,13 +146,12 @@ getAvailableDoctor = function (filter) {
        },
         {
           $project: {
-            name: 1,
+            name:1,
             email: 1,
             specialization: 1,
             phone: 1,
             city: 1,
             appointmentCount:1,
-            appointmentAvailibilty: 0
           },
         },
       ],
