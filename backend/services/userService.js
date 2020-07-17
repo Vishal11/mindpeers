@@ -112,7 +112,7 @@ bookAppointment = function (bookDetail) {
     let userDetail = bookDetail.user;
     let doctorDetail = bookDetail.doctor;
     AppointmentSchema.findOneAndUpdate(
-      { email: doctorDetail.email, name: doctorDetail.name, appointmentDate: bookDetail.appointmentDate },
+      { email: doctorDetail.email, name: doctorDetail.name, appointmentDate: bookDetail.date },
       { $addToSet: { pendingList: userDetail } },
       { new: true, upsert: true },
       function (err, data) {

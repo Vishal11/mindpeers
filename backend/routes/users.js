@@ -35,7 +35,7 @@ router.post('/doctorlist', function (req, res, next) {
     });
 });
 
-router.get('/book', function (req, res, next) {
+router.post('/appointments', function (req, res, next) {
   userService
     .bookAppointment(req.body)
     .then((data) => {
