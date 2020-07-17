@@ -123,7 +123,9 @@ getAvailableDoctor = function (filter) {
 bookAppointment = function (bookDetail) {
   return new Promise((resolve, reject) => {
     let userDetail = bookDetail.user;
+    userDetail['date'] = bookDetail.date;
     let doctorDetail = bookDetail.doctor;
+    doctorDetail['date'] = bookDetail.date;
     AppointmentSchema.findOneAndUpdate(
       {
         email: doctorDetail.email,

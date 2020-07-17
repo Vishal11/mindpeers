@@ -1,7 +1,7 @@
 var mongoose =  require('mongoose');
 
 const Schema = mongoose.Schema;
-const UserDetail = new Schema({name: String, email: String, phone: Number, city: String, medIssue: String})
+const UserDetail = new Schema({name: String, email: String, phone: Number, city: String, medIssue: String, date: Date})
 
 const AppointmentSchema = new Schema({
     name: {
