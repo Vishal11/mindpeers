@@ -57,5 +57,16 @@ router.post('/appointmentslist', function (req, res, next) {
     });
 });
 
+router.put('/appointments/:id', function (req, res, next) {
+  userService
+    .approveAppointment(req.params.id, req.body)
+    .then((data) => {
+      return res.json({success: true, message: "Appointment Approved", data:data});
+    })
+    .catch((err) => {
+      return res.status(400).json({success:false, message: err, data:null });
+    });
+});
+
 
 module.exports = router;

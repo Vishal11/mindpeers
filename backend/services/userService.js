@@ -165,10 +165,23 @@ getAppointmentDetails = function (doctor) {
   });
 };
 
+approveAppointment = function (id, user) {
+  return new Promise((resolve, reject) => {
+  
+    AppointmentSchema.update({"_id": id}, {$pull:{pendingList: {"name": user.name, "email": user.email}}, $push:{approvedList:user}}, function (err, data) {
+      if (err) {
+        reject(err);
+      }
+      resolve(data);
+    });
+  });
+};
+
 module.exports = {
   signupUser,
   authenticateUser,
   getAvailableDoctor,
   bookAppointment,
-  getAppointmentDetails
+  getAppointmentDetails,
+  approveAppointment
 };
