@@ -7,7 +7,7 @@ router.post('/signup', function (req, res, next) {
   userService
     .signupUser(req.body)
     .then((result) => {
-      return res.json({success: true, message: "Account Created !!", data:null});
+      return res.json({success: true, message: "Account Created !!", data:result});
     })
     .catch((err) => {
       return res.status(400).json({success:false, message: err.message,data:null });

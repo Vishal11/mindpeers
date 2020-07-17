@@ -1,6 +1,7 @@
 var { UserSchema } = require("./../model/user");
 var { DoctorSchema } = require("./../model/doctor");
 var { AppointmentSchema } = require("./../model/appointment");
+var jwt = require('jsonwebtoken');
 
 var bcrypt = require("bcrypt");
 const saltRounds = 10;
@@ -19,7 +20,12 @@ signupUser = function (user) {
           if (err) {
             reject(err);
           }
-          resolve("success");
+          let userTemp = {email: user.email}
+          const token = jwt.sign(userTemp, process.env.ACCESS_TOKEN_KEY);
+          let result = JSON.parse(JSON.stringify(data))
+          delete result.password;
+          result["token"] = token
+          resolve(result);
         });
       });
     } else {
@@ -33,7 +39,12 @@ signupUser = function (user) {
           if (err) {
             reject(err);
           }
-          resolve("success");
+          let userTemp = {email: user.email}
+          const token = jwt.sign(userTemp, process.env.ACCESS_TOKEN_KEY);
+          let result = JSON.parse(JSON.stringify(data))
+          delete result.password
+          result["token"] = token
+          resolve(result);
         });
       });
     }
@@ -54,8 +65,13 @@ authenticateUser = function (user) {
               reject(err);
             }
             if (res) {
-              delete data.password;
-              resolve(data);
+              let result = JSON.parse(JSON.stringify(data));
+              delete result.password;
+              let userTemp = {email: user.email}
+              const token = jwt.sign(userTemp, process.env.ACCESS_TOKEN_KEY);
+              result['token'] = token;
+              console.log(result);
+              resolve(result);
             } else {
               reject("Wrong Password !!");
             }
@@ -77,8 +93,15 @@ authenticateUser = function (user) {
               reject(err);
             }
             if (res) {
-              delete data.password;
-              resolve(data);
+                let result = JSON.parse(JSON.stringify(data));
+                delete result.password;
+                let userTemp = {email: user.email}
+                const token = jwt.sign(userTemp, process.env.ACCESS_TOKEN_KEY);
+                console.log(token)
+                console.log(process.env.ACCESS_TOKEN_KEY)
+                result['token'] = token;
+                console.log(result);
+                resolve(result);
             } else {
               reject("Wrong Password !!");
             }
