@@ -7,26 +7,47 @@ var multer = require("multer");
 var storage = multer.diskStorage({
   destination: "./uploads",
   filename: function (req, file, cb) {
-    let ext = file.originalname.substring(file.originalname.lastIndexOf('.'), file.originalname.length);
-    cb(null, "certificate_" + Math.round(Math.random()*1000) +"_"+Date.now()+ext);
+    let ext = file.originalname.substring(
+      file.originalname.lastIndexOf("."),
+      file.originalname.length
+    );
+    cb(
+      null,
+      "certificate_" + Math.round(Math.random() * 1000) + "_" + Date.now() + ext
+    );
   },
 });
 
-var upload = multer({ storage: storage }).single('file');
-
+var upload = multer({ storage: storage }).single("file");
 
 router.post("/signup", function (req, res, next) {
- // console.log(req)
-  
+  // console.log(req)
 
-  upload(req, res, function (err) {
-    if (err) {
-      return res
-        .status(400)
-        .json({ success: false, message: err.message, data: null });
-    }       
-    req.body.filePath = res.req.file.filename
+  if (req.body.userType == "doctor") {
+    upload(req, res, function (err) {
+      if (err) {
+        return res
+          .status(400)
+          .json({ success: false, message: err.message, data: null });
+      }
+      req.body.filePath = res.req.file.filename;
 
+      userService
+        .signupUser(req.body)
+        .then((result) => {
+          return res.json({
+            success: true,
+            message: "Account Created !!",
+            data: result,
+          });
+        })
+        .catch((err) => {
+          return res
+            .status(400)
+            .json({ success: false, message: err.message, data: null });
+        });
+    });
+  } else {
     userService
       .signupUser(req.body)
       .then((result) => {
@@ -41,7 +62,7 @@ router.post("/signup", function (req, res, next) {
           .status(400)
           .json({ success: false, message: err.message, data: null });
       });
-   });
+  }
 });
 
 router.post("/login", function (req, res, next) {
