@@ -1,7 +1,7 @@
 var { UserSchema } = require("./../model/user");
 var { DoctorSchema } = require("./../model/doctor");
 var { AppointmentSchema } = require("./../model/appointment");
-var jwt = require('jsonwebtoken');
+var jwt = require("jsonwebtoken");
 
 var bcrypt = require("bcrypt");
 const saltRounds = 10;
@@ -20,11 +20,11 @@ signupUser = function (user) {
           if (err) {
             reject(err);
           }
-          let userTemp = {email: user.email}
+          let userTemp = { email: user.email };
           const token = jwt.sign(userTemp, process.env.ACCESS_TOKEN_KEY);
-          let result = JSON.parse(JSON.stringify(data))
+          let result = JSON.parse(JSON.stringify(data));
           delete result.password;
-          result["token"] = token
+          result["token"] = token;
           resolve(result);
         });
       });
@@ -39,11 +39,11 @@ signupUser = function (user) {
           if (err) {
             reject(err);
           }
-          let userTemp = {email: user.email}
+          let userTemp = { email: user.email };
           const token = jwt.sign(userTemp, process.env.ACCESS_TOKEN_KEY);
-          let result = JSON.parse(JSON.stringify(data))
-          delete result.password
-          result["token"] = token
+          let result = JSON.parse(JSON.stringify(data));
+          delete result.password;
+          result["token"] = token;
           resolve(result);
         });
       });
@@ -67,9 +67,9 @@ authenticateUser = function (user) {
             if (res) {
               let result = JSON.parse(JSON.stringify(data));
               delete result.password;
-              let userTemp = {email: user.email}
+              let userTemp = { email: user.email };
               const token = jwt.sign(userTemp, process.env.ACCESS_TOKEN_KEY);
-              result['token'] = token;
+              result["token"] = token;
               console.log(result);
               resolve(result);
             } else {
@@ -93,15 +93,15 @@ authenticateUser = function (user) {
               reject(err);
             }
             if (res) {
-                let result = JSON.parse(JSON.stringify(data));
-                delete result.password;
-                let userTemp = {email: user.email}
-                const token = jwt.sign(userTemp, process.env.ACCESS_TOKEN_KEY);
-                console.log(token)
-                console.log(process.env.ACCESS_TOKEN_KEY)
-                result['token'] = token;
-                console.log(result);
-                resolve(result);
+              let result = JSON.parse(JSON.stringify(data));
+              delete result.password;
+              let userTemp = { email: user.email };
+              const token = jwt.sign(userTemp, process.env.ACCESS_TOKEN_KEY);
+              console.log(token);
+              console.log(process.env.ACCESS_TOKEN_KEY);
+              result["token"] = token;
+              console.log(result);
+              resolve(result);
             } else {
               reject("Wrong Password !!");
             }
@@ -118,11 +118,10 @@ getAvailableDoctor = function (filter) {
   return new Promise((resolve, reject) => {
     let date = new Date(filter.date);
     let nextDate = new Date(filter.date);
-nextDate.setDate(date.getDate()+1);
-
+    nextDate.setDate(date.getDate() + 1);
 
     let medIssue = filter.medIssue;
-    
+
     DoctorSchema.aggregate(
       [
         {
@@ -138,13 +137,16 @@ nextDate.setDate(date.getDate()+1);
                   $expr: {
                     $and: [
                       { $eq: ["$email", "$$doctor_email"] },
-                    //   {
-                    //       $and : [ {
-                    //           "appointmentDate" : {$gte: date}
-                    //       }, {
-                    //         "appointmentDate" : {$lt: nextDate}
-                    //       }]
-                    //   }
+                      {
+                        $and: [
+                          {
+                            $gte: ["appointmentDate", date],
+                          },
+                          {
+                            $lt: ["appoinmentDate", nextDate],
+                          },
+                        ],
+                      },
                     ],
                   },
                 },
@@ -154,30 +156,37 @@ nextDate.setDate(date.getDate()+1);
                   appointmentCount: {
                     $cond: {
                       if: {
-                        $isArray : "$approvedList"
+                        $isArray: "$approvedList",
                       },
-                      then : {$size: "$approvedList"},
-                      else : 0
+                      then: { $size: "$approvedList" },
+                      else: 0,
                     },
                   },
                 },
               },
-              { $project: { _id: 0, appointmentCount:1 } },
+              { $project: { _id: 0, appointmentCount: 1 } },
             ],
             as: "appointmentAvailibilty",
           },
         },
         {
-          $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$appointmentAvailibilty", 0 ] }, "$$ROOT" ] } }
-       },
+          $replaceRoot: {
+            newRoot: {
+              $mergeObjects: [
+                { $arrayElemAt: ["$appointmentAvailibilty", 0] },
+                "$$ROOT",
+              ],
+            },
+          },
+        },
         {
           $project: {
-            name:1,
+            name: 1,
             email: 1,
             specialization: 1,
             phone: 1,
             city: 1,
-            appointmentCount:1,
+            appointmentCount: 1,
           },
         },
       ],

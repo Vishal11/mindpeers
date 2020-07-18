@@ -12,10 +12,6 @@ const AppointmentSchema = new Schema({
 		type 	: String, 
 		required: true
     },
-    limit:{
-      type: Number,
-      default: 3
-    },
     appointmentDate: Date,
     approvedList: [UserDetail],
     pendingList: [UserDetail]
