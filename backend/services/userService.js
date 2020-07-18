@@ -30,6 +30,9 @@ signupUser = function (user) {
       });
     } else {
       const userModel = new UserSchema(user);
+      console.log(JSON.stringify(user.data))
+      console.log(JSON.stringify(user))
+      user = user.data
       bcrypt.hash(user.password, saltRounds, function (err, hash) {
         if (err) {
           reject(err);
@@ -41,6 +44,7 @@ signupUser = function (user) {
           }
           let userTemp = { email: user.email };
           const token = jwt.sign(userTemp, process.env.ACCESS_TOKEN_KEY);
+          console.log(data)
           let result = JSON.parse(JSON.stringify(data));
           delete result.password;
           result["token"] = token;
@@ -117,7 +121,8 @@ authenticateUser = function (user) {
 getAvailableDoctor = function (filter) {
   return new Promise((resolve, reject) => {
     let date = new Date(filter.date);
-    let nextDate = new Date(filter.date);
+    date.setTime(0,0,0,0);
+    let nextDate = new Date(date);
     nextDate.setDate(date.getDate() + 1);
 
     let medIssue = filter.medIssue;

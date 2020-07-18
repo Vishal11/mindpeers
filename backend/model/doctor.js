@@ -9,7 +9,8 @@ const DoctorSchema = new Schema({
 	},
     email: {
 		type 	: String, 
-		required: true
+    required: true,
+    unique:true
 	},
     password :	{
 		type 	: String, 
@@ -21,7 +22,8 @@ const DoctorSchema = new Schema({
     },
     phone: Number,
     city: String,
-    specialization: String
+    specialization: String,
+    filePath:String
 
 },{collection : "doctor"})
 

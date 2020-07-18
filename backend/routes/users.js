@@ -5,21 +5,28 @@ var userService = require("./../services/userService");
 var multer = require("multer");
 
 var storage = multer.diskStorage({
-  destination: "./../data/upload",
+  destination: "./uploads",
   filename: function (req, file, cb) {
-    cb(null, "cert" + Math.round(Math.random()) + "_" + file.originalname);
+    let ext = file.originalname.substring(file.originalname.lastIndexOf('.'), file.originalname.length);
+    cb(null, "certificate_" + Math.round(Math.random()*1000) +"_"+Date.now()+ext);
   },
 });
 
-var upload = multer({ storage: storage }).any();
+var upload = multer({ storage: storage }).single('file');
+
 
 router.post("/signup", function (req, res, next) {
+ // console.log(req)
+  
+
   upload(req, res, function (err) {
     if (err) {
       return res
         .status(400)
         .json({ success: false, message: err.message, data: null });
-    }
+    }       
+    req.body.filePath = res.req.file.filename
+
     userService
       .signupUser(req.body)
       .then((result) => {
@@ -34,7 +41,7 @@ router.post("/signup", function (req, res, next) {
           .status(400)
           .json({ success: false, message: err.message, data: null });
       });
-  });
+   });
 });
 
 router.post("/login", function (req, res, next) {
